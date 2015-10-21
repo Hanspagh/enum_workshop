@@ -14,7 +14,8 @@ defmodule EnumWorkshop do
   """
   @spec count(list) :: [Any]
   def count(list) do
-    Enum.count list # replace with your own implementation
+    Enum.reduce(list, 0, fn(_, acc) -> acc+1 end)
+    #Enum.count list # replace with your own implementation
   end
 
   @doc """
@@ -35,8 +36,21 @@ defmodule EnumWorkshop do
   """
   @spec member?(list, Any) :: Boolean
   def member?(list, n) do
-    Enum.member? list, n # replace with your own implementation
+    do_member list, n # replace with your own implementation
   end
+
+  defp do_member([], _) do
+    false
+  end
+
+  defp do_member([head|tail], n) do
+    if head == n do
+      true
+    else
+      do_member(tail,n)
+    end
+  end
+
 
   @doc """
   reimplement the functionality of `Enum.reverse/1` without using the
@@ -53,8 +67,19 @@ defmodule EnumWorkshop do
   """
   @spec reverse(list) :: [Any]
   def reverse(list) do
-    Enum.reverse list # replace with your own implementation
+    do_reverse(list, []) # replace with your own implementation
   end
+
+  defp do_reverse([], acc) do
+    acc
+  end
+
+  defp do_reverse([head|tail], acc) do
+    do_reverse(tail, [head|acc])
+  end
+
+
+
 
   @doc """
   reimplement the functionality of `Enum.min/1` without using the
@@ -70,8 +95,21 @@ defmodule EnumWorkshop do
     3
   """
   @spec min([Integer]) :: Integer
-  def min(list) do
-    Enum.min list # replace with your own implementation
+  def min([]) do
+    :error # replace with your own implementation
+  end
+  def min([head|tail]) do
+    do_min(tail,head) # replace with your own implementation
+  end
+
+  defp do_min([], min) do
+    min
+  end
+  defp do_min([head|tail], min) when head < min do
+    do_min(tail,head)
+  end
+  defp do_min([_|tail], min) do
+    do_min(tail,min)
   end
 
   @doc """
@@ -89,8 +127,20 @@ defmodule EnumWorkshop do
   """
   @spec filter(list, function) :: [Any]
   def filter(list, fun) do
-    Enum.filter list, fun # replace with your own implementation
+    do_filter(list, fun, [])
   end
+
+  defp do_filter([], _, acc) do
+    reverse acc
+  end
+  defp do_filter([head|tail], fun, acc) do
+    if(fun.(head)) do
+      do_filter(tail, fun, [head|acc])
+    else
+      do_filter(tail, fun, acc)
+    end
+  end
+
 
   @doc """
   reimplement the functionality of `Enum.dedup/1` without using the
@@ -106,8 +156,18 @@ defmodule EnumWorkshop do
     [1, 2, 1]
   """
   @spec dedup(list) :: [Any]
-  def dedup(list) do
-    Enum.dedup list # replace with your own implementation
+  def dedup([head|tail]) do
+    do_dedup(tail, head, [head])
+  end
+
+  defp do_dedup([], _, acc) do
+    reverse acc
+  end
+  defp do_dedup([topic|tail], topic, acc) do
+    do_dedup tail, topic, acc
+  end
+  defp do_dedup([head|tail], _, acc) do
+    do_dedup tail, head, [head|acc]
   end
 
   @doc """
@@ -125,7 +185,21 @@ defmodule EnumWorkshop do
   """
   @spec chunk(Any, pos_integer) :: [list]
   def chunk(list, n) do
-    Enum.chunk list, n # replace with your own implementation
+    do_chunk(list,[],0,n,[]) # replace with your own implementation
   end
+
+  defp do_chunk([], acc,n,n, chunk) do
+    reverse [reverse(chunk)|acc]
+  end
+  defp do_chunk([], acc,_, _, _) do
+    reverse acc
+  end
+  defp do_chunk([head|tail],acc,n, n ,chunk) do
+    do_chunk(tail,[reverse(chunk)|acc],1,n,[head])
+  end
+  defp do_chunk([head|tail], acc, m, n ,chunk) do
+    do_chunk(tail,acc,m+1,n,[head|chunk])
+  end
+
 
 end
